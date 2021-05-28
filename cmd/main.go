@@ -7,7 +7,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/alexapps/rhsm"
+	rhsm "github.com/alexapps/rhsm/licensecontroller"
 )
 
 var (
