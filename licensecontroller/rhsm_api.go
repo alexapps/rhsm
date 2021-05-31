@@ -48,7 +48,6 @@ func (c *RHSMClient) GetEntitlement(systemUUID string) (string, error) {
 		return "", err
 	}
 	req.SetBasicAuth(c.User, c.Password)
-
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return "", err
@@ -60,17 +59,19 @@ func (c *RHSMClient) GetEntitlement(systemUUID string) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		fmt.Println("RHSMClient responce: ", string(bodyBytes))
 		entitlements, err := getEntitlements(bodyBytes)
 		if err != nil {
 			return "", err
 		}
-		if len(entitlements) > 1 {
+		if len(entitlements) > 0 {
 			return entitlements[0].ID, nil
 		}
+		return "", errs.Wrap(err, "error: the entitlements are empty")
+
 	} else {
 		return "", errs.Wrap(err, "error getting the entitlements from RHSM")
 	}
-	return "", nil
 }
 
 // Delete removes an Entitlement from a Consumer By the Entitlement ID
@@ -92,8 +93,8 @@ func (c *RHSMClient) Delete(systemUUID, entitlementID string) error {
 	return nil
 }
 
-func getEntitlements(raw []byte) ([]EntitlementDto, error) {
-	var entitlements []EntitlementDto
+func getEntitlements(raw []byte) ([]*EntitlementDto, error) {
+	var entitlements []*EntitlementDto
 	err := json.Unmarshal(raw, &entitlements)
 	return entitlements, err
 }

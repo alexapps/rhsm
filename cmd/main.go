@@ -24,8 +24,11 @@ func main() {
 	if err != nil {
 		fmt.Println("Entitlement getting error", err)
 	}
-	if err := rhsmClient.Delete(UUID, entitlement); err != nil {
-		fmt.Println("Delete subscription error", err)
-	}
+	fmt.Println("Entitlement ", entitlement)
+
+	// Delete
+	// if err := rhsmClient.Delete(UUID, entitlement); err != nil {
+	// 	fmt.Println("Delete subscription error", err)
+	// }
 
 }
