@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/go-logr/logr"
+
 	errs "github.com/pkg/errors"
 )
 
@@ -23,6 +25,7 @@ type RHSMClient struct {
 	User       string
 	Password   string
 	httpClient *http.Client
+	log        logr.Logger
 }
 
 // NewClient implements the RHSM API Client
@@ -97,4 +100,8 @@ func getEntitlements(raw []byte) ([]*EntitlementDto, error) {
 	var entitlements []*EntitlementDto
 	err := json.Unmarshal(raw, &entitlements)
 	return entitlements, err
+}
+
+func (c *RHSMClient) SetLogger(l logr.Logger) {
+	c.log = l
 }
