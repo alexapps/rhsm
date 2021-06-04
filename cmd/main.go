@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	UUID     = ""
-	user     = ""
-	password = ""
+	UUID     = "12a9feec-22bf-4de7-b47d-409c3d83f6bb"
+	user     = "kaas-ci-rhel"
+	password = "OpBauD9ShLxIZN1ccoYR"
 )
 
 func main() {
@@ -26,9 +26,19 @@ func main() {
 	}
 	fmt.Println("Entitlement ", entitlement)
 
-	// Delete
-	// if err := rhsmClient.Delete(UUID, entitlement); err != nil {
-	// 	fmt.Println("Delete subscription error", err)
-	// }
+	// Delete subscription
+	if err := rhsmClient.DeleteSubscription(UUID, entitlement); err != nil {
+		fmt.Println("Delete subscription error", err)
+	}
+	fmt.Println("Delete subscription done ")
 
+	if err := rhsmClient.DeleteConsumer(UUID); err != nil {
+		fmt.Println("Delete consumer error", err)
+	}
+	fmt.Println("Delete consumer done ")
+
+	if err := rhsmClient.GetConsumer("12a9feec-22bf-4de7-b47d-409c3d83f6bb"); err != nil {
+		fmt.Println("Get consumer error", err)
+	}
+	fmt.Println("Get consumer done ")
 }

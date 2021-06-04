@@ -17,7 +17,8 @@ import (
 )
 
 const (
-	RHSMBaseURL = "subscription.rhn.redhat.com"
+	RHSMBaseURL      = "subscription.rhn.redhat.com"
+	RHELManagementV1 = "api.access.redhat.com/management/v1"
 )
 
 // RHSMClient -
@@ -78,7 +79,7 @@ func (c *RHSMClient) GetEntitlement(systemUUID string) (string, error) {
 }
 
 // Delete removes an Entitlement from a Consumer By the Entitlement ID
-func (c *RHSMClient) Delete(systemUUID, entitlementID string) error {
+func (c *RHSMClient) DeleteSubscription(systemUUID, entitlementID string) error {
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("https://%s/subscription/consumers/%s/entitlements/%s", RHSMBaseURL, systemUUID, entitlementID), nil)
 	if err != nil {
 		return err
@@ -92,6 +93,56 @@ func (c *RHSMClient) Delete(systemUUID, entitlementID string) error {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return errs.Wrap(err, "error remove the entitlement from RHSM")
+	}
+	return nil
+}
+
+func (c *RHSMClient) DeleteConsumer(consumerUUID string) error {
+	path := fmt.Sprintf("https://%s/subscription/consumers/%s", RHSMBaseURL, consumerUUID)
+	fmt.Println("GetConsumer path: ", path)
+	req, err := http.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(c.User, c.Password)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return errs.Wrap(err, "error in DeleteConsumer: read responce")
+	}
+	fmt.Println("RHSMClient responce: ", string(bodyBytes))
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return errs.Wrap(err, "error DeleteConsumer from RHSM")
+	}
+	return nil
+}
+
+func (c *RHSMClient) GetConsumer(consumerUUID string) error {
+	path := fmt.Sprintf("https://%s/subscription/consumers/%s", RHSMBaseURL, consumerUUID)
+	fmt.Println("GetConsumer path: ", path)
+	req, err := http.NewRequest("GET", path, nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(c.User, c.Password)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return errs.Wrap(err, "error in GetSystem: read responce")
+	}
+	fmt.Println("RHSMClient responce: ", string(bodyBytes))
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return errs.Wrap(err, "error get the consumer from RHSM")
 	}
 	return nil
 }
